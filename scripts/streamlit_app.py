@@ -87,7 +87,7 @@ world = gpd.read_file("D:/ghg_emissions_project/data/ne_110m_admin_0_countries/n
 print(world.columns)
 merged = world.merge(ghg_df[ghg_df["year"] == selected_year], left_on="ADMIN", right_on="country", how="left")
 fig4 = px.choropleth(merged, locations="ADM0_A3", color="emission_value", hover_name="country",
-                      title=f"Global GHG Emissions in {selected_year}", projection="natural earth")
+                      title=f"Global Green House Gas Emissions in {selected_year}", projection="natural earth")
 st.plotly_chart(fig4, use_container_width=True)
 
 st.write("📌 *Data sourced from the EDGAR Database*")
