@@ -1,0 +1,9 @@
+pandas~=2.2.3
+numpy
+scikit-learn
+plotly~=6.0.0
+streamlit~=1.42.0
+psycopg2-binary
+
+psycopg2~=2.9.10
+SQLAlchemy~=2.0.38

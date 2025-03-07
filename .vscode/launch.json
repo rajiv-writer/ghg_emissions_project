@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Streamlit: Run",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "streamlit",
+            "args": [
+                "run",
+                "scripts/streamlit_app.py"
+            ],
+            "console": "integratedTerminal"
+        }
+    ]
+}
