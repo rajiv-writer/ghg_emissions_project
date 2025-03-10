@@ -90,4 +90,86 @@ fig4 = px.choropleth(merged, locations="ADM0_A3", color="emission_value", hover_
                       title=f"Global Green House Gas Emissions in {selected_year}", projection="natural earth")
 st.plotly_chart(fig4, use_container_width=True)
 
+# -------------------------------
+# Report Generation Feature
+# -------------------------------
+
+import io
+from fpdf import FPDF
+
+# Function to generate CSV data
+def generate_csv(data):
+    return data.to_csv(index=False).encode('utf-8')
+
+# Function to generate a simple PDF report
+from fpdf import FPDF
+import io
+
+def generate_pdf(data):
+    pdf = FPDF()
+    pdf.add_page()
+    # Add a Unicode font (adjust the path as necessary)
+    pdf.add_font("DejaVu", "", "fonts/DejaVuSans.ttf", uni=True)
+    pdf.set_font("DejaVu", size=12)
+    pdf.cell(200, 10, txt="GHG Emissions Report", ln=True, align='C')
+    for _, row in data.iterrows():
+        pdf.cell(200, 10, txt=str(row.to_dict()), ln=True)
+    pdf_buffer = io.BytesIO()
+    pdf.output(pdf_buffer)
+    return pdf_buffer.getvalue()
+
+
+# Create downloadable reports from ghg_df
+csv_data = generate_csv(ghg_df)
+st.download_button(
+    label="📄 Download CSV Report",
+    data=csv_data,
+    file_name="GHG_Emissions_Report.csv",
+    mime="text/csv"
+)
+
+try:
+    pdf_data = generate_pdf(ghg_df)
+    st.download_button(
+        label="📄 Download PDF Report",
+        data=pdf_data,
+        file_name="GHG_Emissions_Report.pdf",
+        mime="application/pdf"
+    )
+except Exception as e:
+    st.error("PDF generation failed: " + str(e))
+
+
+# -------------------------------
+# Gamification & Scenario Simulation
+# -------------------------------
+
+import plotly.express as px
+
+
+st.subheader("🌱 GSCM Strategy Simulator")
+
+# User inputs for strategies
+renewable_energy = st.slider("Renewable Energy Adoption (%)", 0, 100, 50)
+waste_reduction = st.slider("Waste Reduction (%)", 0, 100, 50)
+carbon_offset = st.slider("Carbon Offset Investment ($M)", 0, 500, 100)
+
+# Simulation Calculation
+base_emission = 1000  # Example base emission value
+new_emission = base_emission * (1 - (renewable_energy + waste_reduction) / 200) - (carbon_offset / 10)
+
+# Display Result
+st.metric("Projected Emissions (MT CO2)", f"{new_emission:.2f}")
+
+
+# Data for visualization
+sim_df = pd.DataFrame({
+    "Scenario": ["Current Emissions", "Projected Emissions"],
+    "Emissions (MT CO2)": [base_emission, new_emission]
+})
+
+fig = px.bar(sim_df, x="Scenario", y="Emissions (MT CO2)", title="Impact of GSCM Strategies")
+st.plotly_chart(fig)
+
+
 st.write("📌 *Data sourced from the EDGAR Database*")
