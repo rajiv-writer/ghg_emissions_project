@@ -90,4 +90,50 @@ fig4 = px.choropleth(merged, locations="ADM0_A3", color="emission_value", hover_
                       title=f"Global Green House Gas Emissions in {selected_year}", projection="natural earth")
 st.plotly_chart(fig4, use_container_width=True)
 
+# -------------------------------
+# Report Generation Feature
+# -------------------------------
+
+import io
+from fpdf import FPDF # type: ignore
+
+# Function to generate CSV data
+def generate_csv(data):
+    return data.to_csv(index=False).encode('utf-8')
+
+# Function to generate a simple PDF report
+def generate_pdf(data):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt="GHG Emissions Report", ln=True, align='C')
+    for i, row in data.iterrows():
+        # You can customize this line to format your data more nicely.
+        pdf.cell(200, 10, txt=str(row.to_dict()), ln=True)
+    # Return PDF as bytes
+    pdf_buffer = io.BytesIO()
+    pdf.output(pdf_buffer)
+    return pdf_buffer.getvalue()
+
+# Create downloadable reports from ghg_df
+csv_data = generate_csv(ghg_df)
+st.download_button(
+    label="📄 Download CSV Report",
+    data=csv_data,
+    file_name="GHG_Emissions_Report.csv",
+    mime="text/csv"
+)
+
+try:
+    pdf_data = generate_pdf(ghg_df)
+    st.download_button(
+        label="📄 Download PDF Report",
+        data=pdf_data,
+        file_name="GHG_Emissions_Report.pdf",
+        mime="application/pdf"
+    )
+except Exception as e:
+    st.error("PDF generation failed: " + str(e))
+
+
 st.write("📌 *Data sourced from the EDGAR Database*")
